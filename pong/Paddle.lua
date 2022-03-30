@@ -26,12 +26,14 @@ Paddle = Class{}
     have their own x, y, width, and height values, thus serving as containers
     for data. In this sense, they're very similar to structs in C.
 ]]
-function Paddle:init(x, y, width, height)
+function Paddle:init(x, y, width, height, ai)
     self.x = x
     self.y = y
     self.width = width
     self.height = height
     self.dy = 0
+    self.ai = ai
+    self.power = 10
 end
 
 function Paddle:update(dt)
@@ -39,15 +41,28 @@ function Paddle:update(dt)
     -- current calculated Y position when pressing up so that we don't
     -- go into the negatives; the movement calculation is simply our
     -- previously-defined paddle speed scaled by dt
+    mul = 1
+    if self.ai == 1 then
+        mul = self.power
+    end
+
     if self.dy < 0 then
-        self.y = math.max(0, self.y + self.dy * dt)
+        self.y = math.max(0, self.y + self.dy * dt * mul)
     -- similar to before, this time we use math.min to ensure we don't
     -- go any farther than the bottom of the screen minus the paddle's
     -- height (or else it will go partially below, since position is
     -- based on its top left corner)
     else
-        self.y = math.min(VIRTUAL_HEIGHT - self.height, self.y + self.dy * dt)
+        self.y = math.min(VIRTUAL_HEIGHT - self.height, self.y + self.dy * dt * mul)
     end
+end
+
+function Paddle:decreasePower()
+    self.power = math.max(1, self.power - 2)
+end
+
+function Paddle:resetPower()
+    self.power = 10
 end
 
 --[[
